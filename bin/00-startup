@@ -1,6 +1,12 @@
+ # install Homebrew and some key environmental settings
+ eval "$(/opt/homebrew/bin/brew shellenv)"
+
 # installs the scripts in this directory
 INSTALL_DIR=$(dirname "$0")
 
+# install the scripts
 for f in $INSTALL_DIR/*.zsh ; do
     source $f
 done
+
+ export MANPATH="/usr/share/man:$MANPATH"
