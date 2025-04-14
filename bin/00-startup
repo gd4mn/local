@@ -1,7 +1,6 @@
 # installs the scripts in this directory
 INSTALL_DIR=$(dirname "$0")
 
-echo Installing scripts in $INSTALL_DIR \.\.\.
 for f in $INSTALL_DIR/*.zsh ; do
     source $f
 done

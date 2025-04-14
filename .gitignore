@@ -7,3 +7,5 @@ auth.*
 
 iterm2/
 sourcery/
+
+__pycache__
