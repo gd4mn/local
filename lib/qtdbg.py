@@ -2,6 +2,7 @@ import datetime
 import sys
 from enum import IntEnum
 from rich.console import Console
+from rich.pretty import pprint as dump
 from rich.traceback import install
 
 
@@ -206,6 +207,7 @@ DEBUG_STYLESHEET = """
 
 __all__ = [
     "console",
+    "dump",
     "DEBUG",
     "LOG_LEVEL",
     "DEBUG_FILL_STYLE",
@@ -214,6 +216,15 @@ __all__ = [
 ]
 
 if __name__ == "__main__":
+
+    data = {
+        "name": "John Doe",
+        "age": 30,
+        "city": "New York",
+        "hobbies": ["reading", "gaming", "coding"],
+    }
+    dump(data)
+
     console = ConsoleMessages()
     LOG_LEVEL = LogLevel.ALL
     console.write("All levels:")
