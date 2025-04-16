@@ -4,15 +4,15 @@ INSTALL_DIR=$(realpath "$SCRIPT_DIR")
 DOT_CONFIG="etc"
 
 echo "Installing & linking .local to $INSTALL_DIR"
-if [ ! -d "$HOME/.local_t" ]; then
-    echo ln -s "$INSTALL_DIR" "$HOME/.local"
+if [ ! -d "$HOME/.local" ]; then
+    ln -s "$INSTALL_DIR" "$HOME/.local"
 else
     echo "Directory $HOME/.local already exists!"
     exit
 fi
 
-if [ ! -d "$HOME/.config_t" ]; then
-    echo ln -s "$INSTALL_DIR/$DOT_CONFIG" "$HOME/.config"
+if [ ! -d "$HOME/.config" ]; then
+    ln -s "$INSTALL_DIR/$DOT_CONFIG" "$HOME/.config"
 else
     echo "Directory $HOME/.config already exists!"
 fi
