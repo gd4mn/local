@@ -2,7 +2,7 @@ import datetime
 import sys
 from enum import IntEnum
 from rich.console import Console
-from rich.pretty import pprint as dump
+from rich.pretty import pprint
 from rich.traceback import install
 
 
@@ -97,7 +97,7 @@ class ConsoleMessages:
                 self.timestamp(force_timestamp), message, style=COLOR_SCHEME[level]
             )
 
-    def write(self, message, ending="\n"):
+    def write(self, message, end="\n"):
         """Write a message to stdout.
 
         Writes the given message to stdout with the specified ending.
@@ -106,7 +106,7 @@ class ConsoleMessages:
             message: The message to write.
             ending: The ending to append to the message. Defaults to a newline character.
         """
-        print(message, end=ending)
+        print(message, end=end)
 
     def blank(self, count = 1):
         """Insert one or more blank lines into the output.
@@ -116,7 +116,7 @@ class ConsoleMessages:
         Args:
             count: The number of blank lines to insert. Defaults to 1.
         """
-        self.write("\n" * count, ending="")
+        self.write("\n" * count, end="")
 
     def log(self, message):
         """Log a message to the console.
@@ -178,8 +178,22 @@ class ConsoleMessages:
         """
         self.print(f"Trace: {message}", level=LogLevel.TRACE, force_timestamp=True)
 
+    def dump(self, data):
+        """Dump data to the console using rich's pretty print.
+
+        Prints a header message and then pretty prints the provided data to the console.
+        Inserts a blank line after the output.
+
+        Args:
+            data: The data to dump.
+        """
+        self.console.print("   Dumping data:   ", style="black on red")
+        pprint(data)
+        self.blank()
+
 
 console = ConsoleMessages()
+dump=console.dump
 install(show_locals=True)
 
 if ("-d" in sys.argv) or ("--debug" in sys.argv) or DEBUG:
@@ -215,6 +229,7 @@ __all__ = [
     "ELLIPSIS_MARKER",
 ]
 
+
 if __name__ == "__main__":
 
     data = {
@@ -237,7 +252,7 @@ if __name__ == "__main__":
     console.blank()
 
     LOG_LEVEL = LogLevel.NONE
-    console.write("You should not see any trace, debug or info messages after this one", ELLIPSIS_MARKER)
+    console.write("You should not see any trace, debug or info messages after this one", end=ELLIPSIS_MARKER)
     console.trace("Trace: Hello World!")
     console.debug("Debug: Hello World!")
     console.info("Info: Hello World!")
