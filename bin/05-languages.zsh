@@ -5,3 +5,6 @@
 export PYTHONPATH="$HOME/.local/lib:$PYTHONPATH"
 typeset -U PYTHONPATH
 export VIRTUALENV_HOME=".venv"
+
+export RUSTPATH="/opt/homebrew/opt/rustup/bin:$RUSTPATH"
+typeset -U RUSTPATH
