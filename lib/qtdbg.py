@@ -17,9 +17,9 @@ class LogLevel(IntEnum):
     INFO = 200
     WARNING = 300
     ERROR = 400
-    SUPPRESS = 900  # nothing allowed, except for LOG
+    NONE = 900  # nothing allowed, except for LOG
     LOG = 998       # always allowed
-    NONE = 999      # allows nothing
+    NOTHING = 999      # allows nothing
 
 
 COLOR_SCHEME = {
@@ -29,7 +29,7 @@ COLOR_SCHEME = {
     LogLevel.WARNING: "bold light_goldenrod3",
     LogLevel.ERROR: "bold red on red",
     LogLevel.LOG: "white",
-    LogLevel.NONE: "white",
+    LogLevel.NOTHING: "white",
 }
 
 DEBUG = False
@@ -81,20 +81,15 @@ class ConsoleMessages:
             self.__previous_message_at = current_minute
             return current_time.strftime(self.time_format)
 
-    def print(self, message, level=LogLevel.NONE, force_timestamp=False):
-        """Print a message to the console with a timestamp and style.
+    def print(self, message, level=LogLevel.NOTHING, scheme=None, force_timestamp=False):
+        if scheme:
+            color_scheme = scheme
+        else:
+            color_scheme = COLOR_SCHEME[level]
 
-        Prints the given message to the console with a timestamp,
-        style based on the log level, if the log level is greater than or equal to LOG_LEVEL.
-
-        Args:
-            message: The message to print.
-            level: The log level of the message. Defaults to LogLevel.NONE.
-            force_timestamp: Whether to force a timestamp even if the minute hasn't changed. Defaults to False.
-        """
         if level >= LOG_LEVEL:
             self.console.print(
-                self.timestamp(force_timestamp), message, style=COLOR_SCHEME[level]
+                self.timestamp(force_timestamp), message, style=color_scheme
             )
 
     def write(self, message, end="\n"):
@@ -108,7 +103,7 @@ class ConsoleMessages:
         """
         print(message, end=end)
 
-    def blank(self, count = 1):
+    def blank(self, count=1):
         """Insert one or more blank lines into the output.
 
         Inserts the specified number of blank lines into the output.
@@ -166,7 +161,8 @@ class ConsoleMessages:
         Args:
             message: The message to log.
         """
-        self.print(f"ERROR!: {message}", level=LogLevel.ERROR, force_timestamp=True)
+        self.print(f"ERROR!: {message}",
+                   level=LogLevel.ERROR, force_timestamp=True)
 
     def trace(self, message):
         """Log a trace message to the console.
@@ -176,7 +172,8 @@ class ConsoleMessages:
         Args:
             message: The message to log.
         """
-        self.print(f"Trace: {message}", level=LogLevel.TRACE, force_timestamp=True)
+        self.print(f"Trace: {message}",
+                   level=LogLevel.TRACE, force_timestamp=True)
 
     def dump(self, data):
         """Dump data to the console using rich's pretty print.
@@ -187,19 +184,20 @@ class ConsoleMessages:
         Args:
             data: The data to dump.
         """
-        self.console.print("   Dumping data:   ", style="black on red")
-        pprint(data)
-        self.blank()
+        if LOG_LEVEL < LogLevel.NOTHING:
+            self.console.print("   Dumping data:   ", style="black on red")
+            pprint(data)
+            self.blank()
 
 
 console = ConsoleMessages()
-dump=console.dump
+dump = console.dump
 install(show_locals=True)
 
 if ("-d" in sys.argv) or ("--debug" in sys.argv) or DEBUG:
     DEBUG = True
     LOG_LEVEL = LogLevel.DEBUG
-    console.debug("Debug mode enabled")
+    console.print("Debug mode enabled", scheme="bold red on red")
 
 if ("-t" in sys.argv) or ("--trace" in sys.argv):
     DEBUG = True
@@ -208,13 +206,20 @@ if ("-t" in sys.argv) or ("--trace" in sys.argv):
 
 DEBUG_FILL_STYLE = "background-color: rgba(255, 0, 255, 0.2);"
 DEBUG_STYLESHEET = """
-    QWidget {
-        background-color: rgba(255, 0, 255, 0.2);
-        border: 1px solid rgba(0, 0, 0, 0.5);
+    QMainWindow {
+        background-color: rgb(255, 255, 255);
     }
     QLabel {
         background-color: rgba(0,0,0, 0.25);
-        border: 1px solid rgba(255,255,255,0.5);
+        border: 1px solid rgba(255, 255, 255, 1);
+    }
+    QPushButton {
+        background-color: rgba(255, 0, 255, 0.2);
+        border: 1px solid rgba(0, 0, 0, 1);
+    }
+    QWidget {
+        background-color: rgba(255, 0, 255, 0.2);
+        border: 1px solid rgba(0, 0, 0, 1);
     }
 """
 
@@ -224,6 +229,7 @@ __all__ = [
     "dump",
     "DEBUG",
     "LOG_LEVEL",
+    "LogLevel",
     "DEBUG_FILL_STYLE",
     "DEBUG_STYLESHEET",
     "ELLIPSIS_MARKER",
@@ -251,8 +257,9 @@ if __name__ == "__main__":
     console.log("Hello World!")
     console.blank()
 
-    LOG_LEVEL = LogLevel.NONE
-    console.write("You should not see any trace, debug or info messages after this one", end=ELLIPSIS_MARKER)
+    LOG_LEVEL = LogLevel.NOTHING
+    console.write(
+        "You should not see any trace, debug or info messages after this one", end=ELLIPSIS_MARKER)
     console.trace("Trace: Hello World!")
     console.debug("Debug: Hello World!")
     console.info("Info: Hello World!")
