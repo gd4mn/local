@@ -19,7 +19,7 @@ class LogLevel(IntEnum):
     ERROR = 400
     NONE = 900  # nothing allowed, except for LOG
     LOG = 998       # always allowed
-    NOTHING = 999      # allows nothing
+    NOTHING = 999      # nothing allowed and we're not kidding
 
 
 COLOR_SCHEME = {
@@ -47,30 +47,10 @@ class ConsoleMessages:
     __previous_message_at = 0
 
     def __init__(self, minimum_level=LogLevel.ALL, time_format="%y-%m-%d %H:%M"):
-        """Initialize the ConsoleMessages object.
-
-        Initializes the console and sets the time format.
-
-        Args:
-            minimum_level: The minimum log level to display. Defaults to LogLevel.ALL.
-            time_format: The format for timestamps. Defaults to "%y-%m-%d %H:%M".
-        """
         self.console = Console()
         self.time_format = time_format
 
     def timestamp(self, force_timestamp=False):
-        """Generate a timestamp string or an equivalent blank string.
-
-        Generates a timestamp string in the specified format, or a string of spaces
-        with the same length as a timestamp if the current minute is the same as
-        the previous message's minute and force_timestamp is False.
-
-        Args:
-            force_timestamp: Whether to force a timestamp even if the minute hasn't changed. Defaults to False.
-
-        Returns:
-            str: The timestamp string or a blank string.
-        """
         current_time = datetime.datetime.now()
         current_minute = current_time.minute
         timestring = current_time.strftime(self.time_format)
@@ -82,10 +62,8 @@ class ConsoleMessages:
             return current_time.strftime(self.time_format)
 
     def print(self, message, level=LogLevel.NOTHING, scheme=None, force_timestamp=False):
-        if scheme:
-            color_scheme = scheme
-        else:
-            color_scheme = COLOR_SCHEME[level]
+
+        color_scheme = scheme or COLOR_SCHEME[level]
 
         if level >= LOG_LEVEL:
             self.console.print(
@@ -93,85 +71,28 @@ class ConsoleMessages:
             )
 
     def write(self, message, end="\n"):
-        """Write a message to stdout.
-
-        Writes the given message to stdout with the specified ending.
-
-        Args:
-            message: The message to write.
-            ending: The ending to append to the message. Defaults to a newline character.
-        """
         print(message, end=end)
 
     def blank(self, count=1):
-        """Insert one or more blank lines into the output.
-
-        Inserts the specified number of blank lines into the output.
-
-        Args:
-            count: The number of blank lines to insert. Defaults to 1.
-        """
         self.write("\n" * count, end="")
 
     def log(self, message):
-        """Log a message to the console.
-
-        Logs the given message to the console with the log level set to LogLevel.LOG.
-
-        Args:
-            message: The message to log.
-        """
         self.print(f"Log: {message}", level=LogLevel.LOG)
 
     def debug(self, message):
-        """Log a debug message to the console.
-
-        Logs the given message to the console with the log level set to LogLevel.DEBUG.
-
-        Args:
-            message: The message to log.
-        """
         self.print(f"Debug: {message}", level=LogLevel.DEBUG)
 
     def info(self, message):
-        """Log an info message to the console.
-
-        Logs the given message to the console with the log level set to LogLevel.INFO.
-
-        Args:
-            message: The message to log.
-        """
         self.print(f"Info: {message}", level=LogLevel.INFO)
 
     def warning(self, message):
-        """Log a warning message to the console.
-
-        Logs the given message to the console with the log level set to LogLevel.WARNING.
-
-        Args:
-            message: The message to log.
-        """
         self.print(f"Warning: {message}", level=LogLevel.WARNING)
 
     def error(self, message):
-        """Log an error message to the console.
-
-        Logs the given message to the console with the log level set to LogLevel.ERROR and forces a timestamp.
-
-        Args:
-            message: The message to log.
-        """
         self.print(f"ERROR!: {message}",
                    level=LogLevel.ERROR, force_timestamp=True)
 
     def trace(self, message):
-        """Log a trace message to the console.
-
-        Logs the given message to the console with the log level set to LogLevel.TRACE and forces a timestamp.
-
-        Args:
-            message: The message to log.
-        """
         self.print(f"Trace: {message}",
                    level=LogLevel.TRACE, force_timestamp=True)
 
