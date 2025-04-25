@@ -35,7 +35,7 @@ COLOR_SCHEME = {
 DEBUG = False
 LOG_LEVEL = LogLevel.ERROR
 ELLIPSIS_MARKER = " ... "
-
+TIME_FORMAT = "%y-%m-%d %H:%M"
 
 class ConsoleMessages:
     """A class for managing console messages with timestamps and log levels.
@@ -45,10 +45,12 @@ class ConsoleMessages:
     the same minute unless a timestamp is explicitly forced.
     """
     __previous_message_at = 0
-
-    def __init__(self, minimum_level=LogLevel.ALL, time_format="%y-%m-%d %H:%M"):
+    def __init__(self, minimum_level=LogLevel.ALL, time_format=TIME_FORMAT, prefix=True, color=True):
         self.console = Console()
         self.time_format = time_format
+        self.minimum_level = minimum_level
+        self.prefix = prefix
+        self.color = color
 
     def timestamp(self, force_timestamp=False):
         current_time = datetime.datetime.now()
@@ -63,11 +65,18 @@ class ConsoleMessages:
 
     def print(self, message, level=LogLevel.NOTHING, scheme=None, force_timestamp=False):
 
-        color_scheme = scheme or COLOR_SCHEME[level]
+        if self.color:
+            color_scheme = scheme or COLOR_SCHEME[level]
+        else:
+            color_scheme = None
 
-        if level >= LOG_LEVEL:
+        if level >= self.minimum_level:
+            if self.time_format is not None:
+                m = f"{self.timestamp(force_timestamp)} {message}"
+            else:
+                m = f"{message}"
             self.console.print(
-                self.timestamp(force_timestamp), message, style=color_scheme
+                m, style=color_scheme
             )
 
     def write(self, message, end="\n"):
@@ -77,20 +86,23 @@ class ConsoleMessages:
         self.write("\n" * count, end="")
 
     def log(self, message):
-        self.print(f"Log: {message}", level=LogLevel.LOG)
+        p="Log: " if self.prefix else ""
+        self.print(f"{p}{message}", level=LogLevel.LOG)
 
     def debug(self, message):
+        p="Debug: " if self.prefix else ""
         self.print(f"Debug: {message}", level=LogLevel.DEBUG)
 
     def info(self, message):
-        self.print(f"Info: {message}", level=LogLevel.INFO)
+        p="Info: " if self.prefix else ""
+        self.print(f"{p}{message}", level=LogLevel.INFO)
 
     def warning(self, message):
-        self.print(f"Warning: {message}", level=LogLevel.WARNING)
+        p="Warning: " if self.prefix else ""
+        self.print(f"{p}{message}", level=LogLevel.WARNING)
 
     def error(self, message):
-        self.print(f"ERROR!: {message}",
-                   level=LogLevel.ERROR, force_timestamp=True)
+        self.print(f"Error!: {message}", level=LogLevel.ERROR)
 
     def trace(self, message):
         self.print(f"Trace: {message}",
@@ -109,6 +121,12 @@ class ConsoleMessages:
             self.console.print("   Dumping data:   ", style="black on red")
             pprint(data)
             self.blank()
+
+    def setLogLevel(self, level):
+        self.minimum_level = level
+
+    def setPrefix(self, prefix=True):
+        self.prefix = prefix
 
 
 console = ConsoleMessages()
@@ -178,7 +196,17 @@ if __name__ == "__main__":
     console.log("Hello World!")
     console.blank()
 
-    LOG_LEVEL = LogLevel.NOTHING
+    console.setPrefix(False)
+    console.write("Prefix test:")
+    console.trace("Hello World!")
+    console.debug("Hello World!")
+    console.info("Hello World!")
+    console.warning("Hello World!")
+    console.error("Hello World!")
+    console.log("Hello World!")
+    console.blank()
+
+    console.setLogLevel(LogLevel.NOTHING)
     console.write(
         "You should not see any trace, debug or info messages after this one", end=ELLIPSIS_MARKER)
     console.trace("Trace: Hello World!")
