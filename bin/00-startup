@@ -12,3 +12,5 @@ for f in $INSTALL_DIR/*.zsh ; do
 done
 
 export MANPATH="/usr/share/man:$MANPATH"
+export MANPAGER='nvim +Man!'
+

@@ -1,0 +1,1 @@
+ERR 2025-05-03T19:43:22.766 nvim.28997.0 os_set_cloexec:500: Failed to get flags on descriptor 3: Bad file descriptor
