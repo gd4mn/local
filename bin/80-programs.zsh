@@ -7,5 +7,6 @@ export VIMINIT="source $VIMRC"
 
 # python tools
 export IPYTHONDIR="$HOME/.local/ipython"
-export XDG_CONFIG_HOME="$HOME/.local/bpython"
+export XDG_CONFIG_HOME="$HOME/.local"
+export PTPYTHON_CONFIG_HOME="$HOME/.local"
 
