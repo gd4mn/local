@@ -5,6 +5,7 @@ alias c='clear '
 alias bif='brew info '
 alias dlc='cd ~/.local'
 alias less='cless '
+alias ls='ls -F'
 alias md='mkdir -p '
 #alias min="$APPLICATIONS_DIR/Min.app/Contents/MacOS/Min"
 alias mv='mv -i '
